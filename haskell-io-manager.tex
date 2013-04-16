@@ -1,5 +1,9 @@
 \documentclass{beamer}
 
+\usepackage{color}			 % highlight
+\usepackage{alltt}			 % highlight
+\usepackage{code/highlight}	 % highlight
+
 \usepackage{hyperref}
 \mode<presentation>
 
@@ -9,8 +13,20 @@
 \setbeamertemplate{frametitle continuation}[from second]
 \setbeamertemplate{footline}[frame number]
 
-\pgfdeclareimage[height=4cm]{pong}{img/pong}
-\pgfdeclareimage[height=5cm]{mightynginx}{img/mightynginx}
+\pgfdeclareimage[height=7cm]{pong}{img/pong}
+\pgfdeclareimage[height=6cm]{mightynginx}{img/mightynginx}
+\pgfdeclareimage[height=6cm]{pipes}{img/1m1bpipes}
+\pgfdeclareimage[height=6cm]{scalability}{img/scalability}
+\pgfdeclareimage[height=6cm]{delay}{img/threaddelay}
+\pgfdeclareimage[height=4cm]{rts}{img/rts}
+\pgfdeclareimage[height=3cm]{native}{img/native}
+\pgfdeclareimage[height=3cm]{event}{img/event}
+\pgfdeclareimage[height=3cm]{ppc}{img/ppc}
+\pgfdeclareimage[height=3cm]{green}{img/green}
+\pgfdeclareimage[height=6cm]{mail}{img/mail}
+\pgfdeclareimage[height=6cm]{old}{img/old}
+\pgfdeclareimage[height=6cm]{new}{img/new}
+\pgfdeclareimage[height=7cm]{pipeline}{img/pipeline}
 
 \begin{document}
 
@@ -46,7 +62,7 @@
     \end{itemize}
     \item declarative style
   \end{itemize}
-  TODO: client-server example
+  \input{code/cs.hs}
 \end{frame}
 
 \begin{frame}{Why Haskell?}
@@ -118,9 +134,8 @@
 \end{frame}
 
 \begin{frame}{Compiling Haskell Code}
-  TODO: pipeline photo
-  TODO: tracing factorial
-  TODO: zooming slides
+  \centering
+  \pgfuseimage{pipeline}
 \end{frame}
 
 \begin{frame}{The Runtime System}
@@ -131,7 +146,8 @@
     \item dynamic linkage, primitive operations
     \item thread management and scheduling
   \end{itemize}
-  TODO: RTS pic
+  \centering
+  \pgfuseimage{rts}
 \end{frame}
 
 \begin{frame}{The Runtime System (2)}
@@ -145,7 +161,7 @@
     \item STM support
     \item deterministic locking
   \end{itemize}
-  TODO: lock program + error
+  \texttt{<exe>: thread blocked indefinitely in an MVar operation}
 \end{frame}
 
 \begin{frame}{Threading}
@@ -244,7 +260,7 @@
 \end{frame}
 
 \begin{frame}{Native Threads}
-  TODO: pic
+  \begin{center}\pgfuseimage{native}\end{center}
   \begin{itemize}
     \item \texttt{Apache}
     \pause
@@ -256,7 +272,7 @@
 \end{frame}
 
 \begin{frame}{Event Driven}
-  TODO: pic
+  \begin{center}\pgfuseimage{event}\end{center}
   \begin{itemize}
     \item \texttt{Lighthttpd}
     \pause
@@ -268,7 +284,7 @@
 \end{frame}
 
 \begin{frame}{One Process per Core}
-  TODO: pic
+  \begin{center}\pgfuseimage{ppc}\end{center}
   \begin{itemize}
     \item \texttt{nginx}
     \pause
@@ -279,7 +295,7 @@
 \end{frame}
 
 \begin{frame}{GHC's Green Threads}
-  TODO: pic
+  \begin{center}\pgfuseimage{green}\end{center}
   \begin{itemize}
     \item \texttt{warp}, \texttt{WAI}, \texttt{mighty}
   \end{itemize}
@@ -295,7 +311,8 @@
 \end{frame}
 
 \begin{frame}{A New Haskell IO Manager}
-  TODO: mail + date
+  \centering
+  \pgfuseimage{mail}
 \end{frame}
 
 \begin{frame}{A Scalable IO Manager}
@@ -322,15 +339,38 @@
 \end{frame}
 
 \begin{frame}{Code Changes :: The Old Manager}
-  TODO: pic
+  \centering
+  \pgfuseimage{old}
 \end{frame}
 
 \begin{frame}{Code Changes :: The New Manager}
-  TODO: pic
+  \centering
+  \pgfuseimage{new}
 \end{frame}
 
-\begin{frame}{Results}
-  TODO: pics and graphics
+\begin{frame}{Results :: Thread Timeout Delay}
+  \centering
+  \pgfuseimage{delay}
+\end{frame}
+
+\begin{frame}{Results :: Scalability}
+  \centering
+  \pgfuseimage{scalability}
+\end{frame}
+
+\begin{frame}{Results :: Sending 1M 1-byte Messages Through Pipes}
+  \centering
+  \pgfuseimage{pipes}
+\end{frame}
+
+\begin{frame}{Results :: Ping-Pong Benchmark}
+  \centering
+  \pgfuseimage{pong}
+\end{frame}
+
+\begin{frame}{Results :: \texttt{mighty} vs \texttt{nginx}}
+  \centering
+  \pgfuseimage{mightynginx}
 \end{frame}
 
 \begin{frame}{TODOs}
@@ -353,9 +393,11 @@
 \frame{\tableofcontents[currentsection]}
 
 \begin{frame}{Scheduler}
+  TODO
 \end{frame}
 
 \begin{frame}{GHC's Concurrency RTS}
+  TODO
 \end{frame}
 
 \end{document}
