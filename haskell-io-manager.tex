@@ -1,0 +1,361 @@
+\documentclass{beamer}
+
+\usepackage{hyperref}
+\mode<presentation>
+
+\title{A New Haskell IO Manager}
+\author{Mihai Maruseac, ROSEdu\\mihai@rosedu.org}
+
+\setbeamertemplate{frametitle continuation}[from second]
+\setbeamertemplate{footline}[frame number]
+
+\pgfdeclareimage[height=4cm]{pong}{img/pong}
+\pgfdeclareimage[height=5cm]{mightynginx}{img/mightynginx}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{What is Haskell?}
+  \begin{itemize}
+    \item functional programming language
+    \item 1990, academic research committee
+    \item common language for research
+    \pause
+    \item purely functional
+    \item lazy
+    \begin{itemize}
+      \item reasoning about program
+      \item barrier for non-functional features
+    \end{itemize}
+    \pause
+    \item strongly typed
+    \item type inference
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Usage}
+  \begin{itemize}
+    \item spread over multiple domains
+    \begin{itemize}
+      \item Maths and sciences
+      \item games
+      \item graphics
+      \item compilers
+      \item networking
+    \end{itemize}
+    \item declarative style
+  \end{itemize}
+  TODO: client-server example
+\end{frame}
+
+\begin{frame}{Why Haskell?}
+  \begin{itemize}
+    \item declarative style
+    \pause
+    \item correctness
+    \begin{itemize}
+      \item strong static typing
+      \item pure functions
+      \item special types for impure functions
+    \end{itemize}
+    \pause
+    \item performance
+    \begin{itemize}
+      \item statically compiled
+      \item alternative to \texttt{C++} / \texttt{Java}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{GHC}
+  \begin{itemize}
+    \item \texttt{The Glorious Glasgow Haskell Compilation System}
+    \pause
+    \item started as academic research funded by UK
+    \begin{itemize}
+      \item freely available, robust, portable compiler
+      \item high-performance code
+      \item research for better compilers (learn how programs behave)
+      \item modular foundation for other researchers
+    \end{itemize}
+    \pause
+    \item Microsoft Research
+    \item other contributors
+    \item Open Source model
+    \pause
+    \item recommended suite for Haskell development
+    \item \texttt{ghc}, \texttt{ghci}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Higher Level Structure}
+  \begin{itemize}
+    \item compiler itself
+    \begin{itemize}
+      \item Haskell source code $\rightarrow$ executable \textbf{binary} code
+    \end{itemize}
+    \pause
+    \item Boot Libraries
+    \begin{itemize}
+      \item needed by compiler
+      \item bootstrapping
+      \item low level functionality: \texttt{Int} in terms of primitive types, $\ldots$
+      \item high level functionality: efficient data structures for compiler
+      and RTS
+    \end{itemize}
+    \pause
+    \item Runtime System (RTS)
+    \begin{itemize}
+      \item C library
+      \item running compiled Haskell code
+      \item garbage collection, thread scheduling, profiling, exception
+      handling, $\ldots$
+      \item linked into every compiled program
+      \item responsible for GHC's key strengths: concurrency and parallelism
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Compiling Haskell Code}
+  TODO: pipeline photo
+  TODO: tracing factorial
+  TODO: zooming slides
+\end{frame}
+
+\begin{frame}{The Runtime System}
+  \begin{itemize}
+    \item profiling
+    \item memory management
+    \item parallel, generational, garbage collector
+    \item dynamic linkage, primitive operations
+    \item thread management and scheduling
+  \end{itemize}
+  TODO: RTS pic
+\end{frame}
+
+\begin{frame}{The Runtime System (2)}
+  \begin{itemize}
+    \item bits to execute Haskell code which cannot be translated into binary
+    \begin{itemize}
+      \item code to throw exception
+      \item code to allocate \texttt{\#Array} objects
+      \item $\ldots$
+    \end{itemize}
+    \item STM support
+    \item deterministic locking
+  \end{itemize}
+  TODO: lock program + error
+\end{frame}
+
+\begin{frame}{Threading}
+  \begin{itemize}
+    \item concurrency = important abstraction
+    \item make it cheap, programmers avoid costly abstractions/paradigms
+    \item no thread-pools management by programmer
+    \item just works
+    \pause
+    \item OSes struggle with 1000s of threads
+    \item GHC wanted/capable to handle milions
+    \pause
+    \item models:
+    \begin{itemize}
+      \item kernel
+      \item userspace
+      \item hybrid
+    \end{itemize}
+    \pause
+    \item green-threads and sparks
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Threading (2)}
+  \begin{itemize}
+    \item context switch only at \textit{safe points}
+    \item save as little state as possible
+    \pause
+    \item accurate GC $\rightarrow$ expand/shrink thread's stack on demand
+    \item OS threads: stacks are immovable
+    \item GHC's threads: 0-copy threads
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Green-threads problems}
+  \begin{itemize}
+    \item blocking
+    \item foreign calls (FFI or library)
+    \item parallelism (run on all available cores)
+    \item library constraints
+    \begin{itemize}
+      \item OpenGL, GUI libraries: API calls done on specific threads
+      \item thread-local state
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Perseverance Paid}
+  \begin{itemize}
+    \item Haskell threads makes foreign call $\rightarrow$ OS thread for the
+    other Haskell threads
+    \item small pool of OS threads
+    \item RTS multiplexing: transparent M:N threading model
+    \pause
+    \item \textit{capabilities}:
+    \begin{itemize}
+      \item \textit{nursery} -- access to new object creation
+      \item each OS thread must hold these
+      \item each one is owned by a single OS thread
+    \end{itemize}
+    \pause
+    \item API for binding Haskell threads to OS threads
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{One Small Problem}
+  \begin{itemize}[<+->]
+    \item \textit{safe points} for context-switching
+    \item memory allocation
+    \item tight-loops -- no memory allocation
+    \item frequent in benchmarks, less frequent in actual code
+    \item no safe points $\rightarrow$ unable to schedule
+    \item compromise between saving every cycle and having scheduling
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Context Requiring Some New Manager}
+  \begin{itemize}
+    \item server applications
+    \pause
+    \item performance matters
+    \item scalability
+    \pause
+    \item majority of applications -- HTTP servers
+    \begin{itemize}
+      \item most clients are idle most of the time
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Missing Things}
+  \begin{itemize}
+    \item support for a really large number of connections
+    \item large number of active timeouts
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Native Threads}
+  TODO: pic
+  \begin{itemize}
+    \item \texttt{Apache}
+    \pause
+    \item clear code
+    \item load balancing on cores
+    \pause
+    \item many context-switches
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Event Driven}
+  TODO: pic
+  \begin{itemize}
+    \item \texttt{Lighthttpd}
+    \pause
+    \item no process switching
+    \pause
+    \item single-core usage
+    \item fragmented code
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{One Process per Core}
+  TODO: pic
+  \begin{itemize}
+    \item \texttt{nginx}
+    \pause
+    \item core load-balancing
+    \pause
+    \item fragmented code
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{GHC's Green Threads}
+  TODO: pic
+  \begin{itemize}
+    \item \texttt{warp}, \texttt{WAI}, \texttt{mighty}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Problems with \texttt{select}}
+  \begin{itemize}[<+->]
+    \item non-scalable
+    \item O(number of connections)
+    \item limited number of file descriptors
+    \item must iterate on file descriptor set
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{A New Haskell IO Manager}
+  TODO: mail + date
+\end{frame}
+
+\begin{frame}{A Scalable IO Manager}
+  \begin{itemize}
+    \item \texttt{epoll}/\texttt{kqueue} event loop
+    \item don't use lists for timeouts or other things
+    \begin{itemize}[<+->]
+      \item trees and heaps
+      \item priority queues
+      \item adjust/cancel pending timeouts
+      \item data structures specialised based on contained type
+      \item unpacked data types
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Network API}
+  \begin{itemize}
+    \item memory-mapped I/O
+    \item zero-copy transfer (\texttt{sendfile})
+    \item scatter-gather I/O (\texttt{writev})
+    \item async socket I/O API (\texttt{TCP\_CORK})
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Code Changes :: The Old Manager}
+  TODO: pic
+\end{frame}
+
+\begin{frame}{Code Changes :: The New Manager}
+  TODO: pic
+\end{frame}
+
+\begin{frame}{Results}
+  TODO: pics and graphics
+\end{frame}
+
+\begin{frame}{TODOs}
+  \begin{itemize}
+    \item Windows \pause -- \texttt{IO Completion Ports}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Resources}
+  \begin{itemize}
+    \item \href{http://learnyouahaskell.com/}{Learn You a Haskell}
+    \item \href{http://book.realworldhaskell.org/read/}{Real World Haskell}
+    \item \href{http://www.aosabook.org/en/ghc.html}{Architecture of Open Source Application. GHC Chapter}
+    \item \href{http://hackage.haskell.org/trac/ghc/wiki/Commentary}{GHC Commentary}
+    \item \href{https://github.com/ghc/ghc}{GHC's Source code}
+  \end{itemize}
+\end{frame}
+
+\section{Extra slides}
+\frame{\tableofcontents[currentsection]}
+
+\begin{frame}{Scheduler}
+\end{frame}
+
+\begin{frame}{GHC's Concurrency RTS}
+\end{frame}
+
+\end{document}
