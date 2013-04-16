@@ -32,3 +32,5 @@
 *.tdo
 *.pdf
 /texfiles
+code/cs.hs.tex
+code/highlight.sty
