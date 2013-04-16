@@ -343,7 +343,7 @@
   \pgfuseimage{old}
 \end{frame}
 
-\begin{frame}{Code Changes :: The New Manager}
+\begin{frame}[label=new]{Code Changes :: The New Manager}
   \centering
   \pgfuseimage{new}
 \end{frame}
@@ -393,11 +393,97 @@
 \frame{\tableofcontents[currentsection]}
 
 \begin{frame}{Scheduler}
-  TODO
+  \begin{itemize}
+    \item OS threads
+    \begin{itemize}
+      \item support non-blocking foreign threads
+      \item support SMP parallelism
+      \pause
+      \item \texttt{+RTS -N} option
+      \item more might be created
+      \item kept in pool
+      \item attached to capabilities
+      \item platform-independent abstraction
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Scheduler (2)}
+  \begin{itemize}
+    \item green threads
+    \begin{itemize}
+      \item Thread State Objects
+      \item garbage collected
+      \item bound/unbound
+      \item fields
+      \begin{itemize}
+        \item \texttt{link} -- list of TSOs
+        \item \texttt{what\_next} -- what to resume
+        \item \texttt{why\_blocked} -- why is thread blocked
+        \item \texttt{bound}
+        \item \texttt{cap} -- capability
+        \item $\ldots$
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Scheduler (3)}
+  \begin{itemize}
+    \item tasks
+    \begin{itemize}
+      \item abstraction over OS thread
+      \item thread-local storage
+      \item mutex and condition variable for OS threads synchronisation
+      \item capability
+    \end{itemize}
+    \pause
+    \item capabilities
+    \begin{itemize}
+      \item virtual CPU for executing Haskell code
+      \item count should be close to the number of CPU cores
+      \item \textit{thread holding a capability -- not blocked}
+      \item spinlocks, deterministic locking
+    \end{itemize}
+    \pause
+    \item sparks
+    \begin{itemize}
+      \item for \texttt{par} operator
+      \item optimistic threading
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{GHC's Concurrency RTS}
-  TODO
+  \begin{itemize}
+    \item give control to the programmer
+    \item without decreasing performance or increasing complexity
+    \item lift parts of RTS to Haskell library code
+    \item concurrency substrate
+  \end{itemize}
+\end{frame}
+
+\againframe{new}
+
+\begin{frame}{Concurrency Substrate}
+  \begin{itemize}
+    \item minimal set of primitives
+    \begin{itemize}
+      \item create threads
+      \item schedule them
+      \item synchronization mechanism in multiprocessor context
+    \end{itemize}
+    \pause
+    \item user-level concurrency libraries
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{PTM}
+  \begin{itemize}
+    \item primitive transactional memory
+    \item lockless code
+  \end{itemize}
+  \input{code/ptm.hs}
 \end{frame}
 
 \end{document}

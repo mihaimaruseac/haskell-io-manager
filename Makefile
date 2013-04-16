@@ -4,7 +4,7 @@ TEX = $(addsuffix .tex, $(BASENAME))
 PDFLATEX = pdflatex
 OUT_DIR = texfiles
 
-CODEINPUTS = cs.hs
+CODEINPUTS = cs.hs ptm.hs
 CODEDIR = code
 CODEINPUTSTEX = $(addprefix $(CODEDIR)/, $(addsuffix .tex, $(CODEINPUTS)))
 HIGHLIGHTSTY = highlight.sty
